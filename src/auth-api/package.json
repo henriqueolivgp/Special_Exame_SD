@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
-    "migrate": "knex migrate:latest --env db"
+    "migrate": "knex migrate:latest --knexfile knexfile.js --env db"
   },
   "author": "",
   "license": "ISC",
