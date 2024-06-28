@@ -2,15 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// Database connection configs
-const dbConfig = {
-    user: 'your_user',
-    host: 'your_host',
-    database: 'your_database',
-    password: 'your_password',
-    port: 5432
-};
-
 // HelloWorld module
 const HelloWorld = {
     say: function() {
@@ -38,7 +29,7 @@ const JSONObserver = {
     },
 
     parse: function(content) {
-        console.log(`JSON Content of the file: \n${content}`);sa
+        console.log(`JSON Content of the file: \n${content}`);
         try {
             const items = JSON.parse(content).map(item => ({
                 name: item.name[0],
@@ -51,34 +42,7 @@ const JSONObserver = {
             console.error(`Error parsing JSON: ${err}`);
             return;
         }
-    },
-
-    // insertToDatabase: async function(items) {
-    //     const client = new Client(dbConfig);
-
-    //     try {
-    //         await client.connect();
-    //         console.log('Connected to the database.');
-
-    //         for (const item of items) {
-    //             const query = 'INSERT INTO your_table_name (name, description) VALUES ($1, $2)';
-    //             const values = [item.name, item.description];
-
-    //             try {
-    //                 await client.query(query, values);
-    //                 console.log(`Inserted: ${JSON.stringify(item)}`);
-    //             } catch (err) {
-    //                 console.error(`Error inserting data: ${err}`);
-    //             }
-    //         }
-
-    //     } catch (err) {
-    //         console.error(`Database connection error: ${err}`);
-    //     } finally {
-    //         await client.end();
-    //         console.log('Disconnected from the database.');
-    //     }
-    // }
+    }
 };
 
 // Application Module

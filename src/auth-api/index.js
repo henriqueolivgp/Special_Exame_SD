@@ -8,6 +8,10 @@ const app = express();
 app.use(cors());
 
 app.get('/', async (req, res) => {
+    res.send('Welcome auth API')
+})
+
+app.get('/teachers', async (req, res) => {
     try {
         const teachers = await knex.select('*').from('teachers');
         res.json(teachers);

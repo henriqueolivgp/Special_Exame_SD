@@ -4,15 +4,16 @@ import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
-  const port = process.env.BL_API_PORT || 8080;
+  const port = process.env.PORT;
 
   try {
-    const app = await NestFactory.create(AppModule, { cors: true });
-    console.log('entrei na api');
+    const app = await NestFactory.create(AppModule, { cors: false });
+    app.enableCors();
+
     await app.listen(port, () => {
       const address = `http://localhost:${port}`;
       logger.log(`Server is running on ${address}`);
-      console.log('estou a ouvir');
+      logger.log(`Swagger is running on ${address}/docs`);
     });
   } catch (err) {
     logger.error('Error starting server:', err);

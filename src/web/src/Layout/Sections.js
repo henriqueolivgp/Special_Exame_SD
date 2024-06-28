@@ -1,6 +1,6 @@
-import { SignUp } from "../Menus/TopTeams";
-import { SignIn } from "../screens/SignIn";
-import { TopTeams } from "../Menus/TopTeams";
+import TopTeams from "../Menus/TopTeams";
+import { Register } from "../Menus/register";
+
 
 
 const Sections = [
@@ -9,22 +9,22 @@ const Sections = [
         id: "top-teams",
         label: "Top Teams",
         to: "/",
-        content: <TopTeams />
+        content: <TopTeams/>
     },
+    // register
     {
         id: "register",
         label: "Register",
-        to: "register",
-        content: <SignUp />
+        to: "/register",
+        content: <Register/>
     },
-
+    // login
     {
-        id: "Login",
-        label: "Login",
-        to: "/login",
-        content: <SignIn />
-    }
-
+        id: "register",
+        label: "Register",
+        to: "/register",
+        content: <Register/>
+    },
 ];
 
 export default Sections;

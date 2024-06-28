@@ -1,15 +1,16 @@
 module.exports = {
-    db: {
-        client: 'pg',
-        connection: {
-            host: 'auth-db',
-            user: 'sd',
-            password: 'sd',
-            database: 'sd'
-        },
-        migrations: {
-            tableName: 'knex_migrations',
-            directory: './migrations'
-        }
-    }
+  db: {
+      client: 'pg',
+      connection: {
+          host: 'localhost',
+          user: 'sd',
+          password: 'sd',
+          database: 'sd'
+      },
+      migrations: {
+          tableName: 'knex_migrations',
+          directory: './migrations'
+      }
+  }
 };
+

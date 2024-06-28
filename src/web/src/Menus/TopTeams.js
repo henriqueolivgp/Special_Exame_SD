@@ -21,7 +21,7 @@ const DEMO_TEAMS = [
 const COUNTRIES = [...new Set(DEMO_TEAMS.map(team => team.country))];
 
 
-export function TopTeams() {
+function TopTeams() {
 
     const [selectedCountry, setSelectedCountry] = useState("");
 
@@ -91,3 +91,4 @@ export function TopTeams() {
     );
 }
 
+export default TopTeams;
