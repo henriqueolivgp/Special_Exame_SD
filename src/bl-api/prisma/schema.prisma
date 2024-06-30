@@ -10,16 +10,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Teacher {
-  name      String   @id
-  city      String
-  createdOn DateTime @default(now()) @map("created_on")
-  updatedOn DateTime @updatedAt @map("updated_on")
-
-  @@map("teachers")
+model Movies {
+  movie_id         Int     @id @default(autoincrement())
+  title            String
+  year             Int
+  cast_id          Int     @default(autoincrement())
+  cast             Casts   @relation(fields: [cast_id], references: [cast_id])
+  genres_id        Int     @default(autoincrement())
+  genres           Genres  @relation(fields: [genres_id], references: [genres_id])
+  href             String?
+  extract          String?
+  thumbnail        String?
+  thumbnail_width  Int?
+  thumbnail_height Int?
 }
 
-model Users {
-  id     Int     @id
-  name String
+model Casts {
+  cast_id Int      @id @default(autoincrement())
+  name    String?
+  Movies  Movies[]
+}
+
+model Genres {
+  genres_id Int      @id @default(autoincrement())
+  name      String?
+  Movies    Movies[]
 }

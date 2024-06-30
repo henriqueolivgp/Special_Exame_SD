@@ -50,7 +50,7 @@ services:
       - USE_DEV_MODE
       - PORT=70
       - SWAGGER_PORT=7080
-      - DATABASE_URL=postgresql://postgres:postgres@bl-db:5432/sd?schema=public
+      - DATABASE_URL=postgresql://sd:sd@bl-db:5432/sd?schema=public
 
   importer:
     container_name: importer

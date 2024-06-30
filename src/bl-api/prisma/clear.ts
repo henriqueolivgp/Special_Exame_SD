@@ -1,10 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
   // Adicione aqui todas as tabelas do seu banco de dados
-  await prisma.teacher.deleteMany({});
-  await prisma.users.deleteMany({});
+  await prisma.movies.deleteMany({});
+  await prisma.casts.deleteMany({});
+  await prisma.genres.deleteMany({});
   // Continue para cada tabela no seu banco de dados...
 }
 
