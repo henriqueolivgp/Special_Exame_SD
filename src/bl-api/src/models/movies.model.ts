@@ -17,11 +17,17 @@ const MoviesSchema = z.object({
 
 type Movie = z.infer<typeof MoviesSchema>;
 
+const MovieIdSchema = z.object({
+  movie_id: z.coerce.number(),
+});
+
+type MovieId = z.infer<typeof MovieIdSchema>;
+
 const MoviesInsertSchema = z.object({
   title: z.string(),
   year: z.coerce.number(),
-  cast: z.string().optional(),
-  genres: z.string().optional(),
+  cast_name: z.string().optional(),
+  genres_name: z.string().optional(),
   href: z.string().optional(),
   extract: z.string().optional(),
   thumbnail: z.string().optional(),
@@ -48,6 +54,8 @@ type MovieUpdate = z.infer<typeof MoviesUpdateSchema>;
 export {
   MoviesSchema,
   Movie,
+  MovieIdSchema,
+  MovieId,
   MoviesInsertSchema,
   MovieInsert,
   MoviesUpdateSchema,

@@ -28,7 +28,7 @@ const JSONObserver = {
         } catch (error) {
             console.log(`Error accessing /data: ${error}`);
         }
-    }, 
+    },
 
     processFile: function (fileName) {
         console.log(`Processing file: ${fileName}`);
@@ -37,8 +37,7 @@ const JSONObserver = {
         JSONObserver.parse(content);
     },
 
-
-    // le o ficheiro .json e guarda os dados dentro de uma variavel
+    // Read the .json file and save the data into a variable
     parse: function (content) {
         console.log(`JSON Content of the file: \n${content}`);
         try {
@@ -50,14 +49,14 @@ const JSONObserver = {
                 href: movie.href,
                 extract: movie.extract,
                 thumbnail: movie.thumbnail,
-                thumbnail_width: parseInt(movie.thumbnail_width) || null, // Conversão para número inteiro
-                thumbnail_height: parseInt(movie.thumbnail_height) || null // Conversão para número inteiro 
+                thumbnail_width: parseInt(movie.thumbnail_width) || null, // Convert to integer
+                thumbnail_height: parseInt(movie.thumbnail_height) || null // Convert to integer
             }));
-            
+
             console.log(movies);
-            // assim que os dados sao guardados na variavel e chamada a funcao de insert data
-            // ou seja todos os movies dentro da variavel movies seram inseridos na db
-            this.insertToDatabase(movies);
+            // Call the insert function once the data is stored in the variable
+            // This will insert all movies in the movies variable into the db
+            await = this.insertToDatabase(movies);
 
         } catch (err) {
             console.error(`Error parsing JSON: ${err}`);
@@ -65,29 +64,42 @@ const JSONObserver = {
         }
     },
 
-    // a funcao recebe entao a variavel movies que ira conter todos os dados do ficheiro .json
-    // e ira inseri-los dentro da db
+    // Insert movies into the database
     insertToDatabase: async function (movies) {
         const client = new Client(dbConfig);
-    
+        console.log('os filmes foram recebidos' + JSON.stringify(movies))
+
         try {
             await client.connect();
             console.log('Connected to the database.');
-    
+            const deleteData = `
+            DELETE FROM "Movies"; 
+            DELETE FROM "Genres";
+            DELETE FROM "Casts";
+        `;
+            try {
+                await client.query(deleteData);
+                console.log(`All data deleted in Movies, Casts and Genres`);
+            } catch (err) {
+                console.error(`Error delete=ing data: ${err}`);
+            }
+
             for (const movie of movies) {
+
                 let castId = await this.getOrInsertCastId(client, movie.cast);
                 let genresId = await this.getOrInsertGenresId(client, movie.genres);
-    
+
                 const query = `
                     INSERT INTO "Movies" 
                     (title, year, href, extract, thumbnail, thumbnail_width, thumbnail_height, cast_id, genres_id) 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 `;
+
                 const values = [
-                    movie.title, movie.year, movie.href, movie.extract, movie.thumbnail, 
+                    movie.title, movie.year, movie.href, movie.extract, movie.thumbnail,
                     movie.thumbnail_width, movie.thumbnail_height, castId, genresId
                 ];
-    
+
                 try {
                     await client.query(query, values);
                     console.log(`Inserted: ${JSON.stringify(movie)}`);
@@ -95,7 +107,7 @@ const JSONObserver = {
                     console.error(`Error inserting data: ${err}`);
                 }
             }
-    
+
         } catch (err) {
             console.error(`Database connection error: ${err}`);
         } finally {
@@ -103,10 +115,10 @@ const JSONObserver = {
             console.log('Disconnected from the database.');
         }
     },
-    
+
     getOrInsertCastId: async function (client, castName) {
         if (!castName) return null;
-    
+
         try {
             const res = await client.query('SELECT cast_id FROM "Casts" WHERE name = $1', [castName]);
             if (res.rows.length > 0) {
@@ -120,10 +132,10 @@ const JSONObserver = {
             return null;
         }
     },
-    
+
     getOrInsertGenresId: async function (client, genreName) {
         if (!genreName) return null;
-    
+
         try {
             const res = await client.query('SELECT genres_id FROM "Genres" WHERE name = $1', [genreName]);
             if (res.rows.length > 0) {
@@ -137,9 +149,6 @@ const JSONObserver = {
             return null;
         }
     }
-    
-
-
 };
 
 // Application Module
