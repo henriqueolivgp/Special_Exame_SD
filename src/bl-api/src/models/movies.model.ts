@@ -56,8 +56,8 @@ export {
   Movie,
   MovieIdSchema,
   MovieId,
-  MoviesInsertSchema,
   MovieInsert,
+  MoviesInsertSchema,
   MoviesUpdateSchema,
   MovieUpdate,
 };

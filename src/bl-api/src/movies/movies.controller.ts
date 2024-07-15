@@ -15,7 +15,7 @@ import { MoviesService } from './movies.service';
 import {
   Movie,
   MovieIdSchema,
-  MoviesInsertSchema,
+  // MoviesInsertSchema,
   MovieInsert,
   // MoviesInsertSchema,
   // MoviesUpdateSchema,
@@ -43,26 +43,16 @@ export class MoviesController {
   }
 
   @Post()
-  async create(@Body() body: MovieInsert): Promise<any> {
+  async create(@Body() movies: MovieInsert): Promise<Movie> {
     try {
       // Validação dos dados de entrada utilizando Zod
-      const parsedBody: MovieInsert = MoviesInsertSchema.parse(body);
-
+      // const parsedBody: MovieInsert = MoviesInsertSchema.parse(movies);
       // const cast = await this.castsService.create(parsedBody.cast_name);
-
       // Chama o serviço para criar o filme
-      const newMovie = await this.moviesService.create(
-        parsedBody.title,
-        parsedBody.year,
-        parsedBody.cast_name,
-        parsedBody.genres_name,
-        parsedBody.href,
-        parsedBody.extract,
-        parsedBody.thumbnail,
-        parsedBody.thumbnail_width,
-        parsedBody.thumbnail_height,
-      );
-
+      const newMovie = await this.moviesService.create({
+        ...movies,
+        // cast_name: ,
+      });
       return newMovie;
     } catch (error) {
       if (error) {
@@ -84,8 +74,12 @@ export class MoviesController {
   //   return this.moviesService.update(movie_id, parsedMovie);
   // }
 
-  @Delete(':id')
+  @Delete(':movie_id')
   async remove(@Param('movie_id') movie_id: number): Promise<void> {
-    return this.moviesService.remove(movie_id);
+    try {
+      this.moviesService.remove(movie_id);
+    } catch (error) {
+      throw new Error('Error a apagar movie');
+    }
   }
 }

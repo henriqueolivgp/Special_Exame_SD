@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Movie } from '../models/movies.model';
+import { Movie, MovieInsert, MoviesInsertSchema } from '../models/movies.model';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class MoviesService {
@@ -27,56 +28,32 @@ export class MoviesService {
     }
   }
 
-  async create(
-    title: string,
-    year: number,
-    cast_name: string,
-    genres_name: string,
-    href: string,
-    extract: string,
-    thumbnail: string,
-    thumbnailWidth: number,
-    thumbnailHeight: number,
-  ): Promise<Movie> {
+  async create(movies: MovieInsert): Promise<MovieInsert> {
     try {
-      const newCasts = await this.prisma.casts.create({
-        data: {
-          name: cast_name,
-        },
-      });
+      // Valida o input conforme o zod schema
+      const validatedMovies = MoviesInsertSchema.parse(movies);
 
-      const newGenres = await this.prisma.genres.create({
-        data: {
-          name: genres_name,
-        },
-      });
-
+      // Certifique-se que os campos estejam todos to tipo certo, corretamente e obrigatórios
       const newMovie = await this.prisma.movies.create({
-        data: {
-          title,
-          year,
-          cast: {
-            connect: { cast_id: newCasts.cast_id },
-          },
-          genres: {
-            connect: { genres_id: newGenres.genres_id },
-          },
-          href,
-          extract,
-          thumbnail,
-          thumbnail_width: thumbnailWidth,
-          thumbnail_height: thumbnailHeight,
-        },
+        data: validatedMovies as Prisma.MoviesCreateInput,
       });
+
       return newMovie;
     } catch (error) {
-      throw new Error('Erro ao inserir o movie');
+      throw new Error('Erro ao inserir o movie: ' + error.message);
     }
   }
 
   async remove(movie_id: number): Promise<void> {
-    await this.prisma.movies.delete({
-      where: { movie_id: movie_id },
-    });
+    try {
+      await this.prisma.movies.delete({
+        where: {
+          movie_id: movie_id,
+        },
+      });
+      return console.log('Movie apagado com sucesso');
+    } catch (error) {
+      throw new Error('Error ao apagar um filme: ' + JSON.stringify(error));
+    }
   }
 }

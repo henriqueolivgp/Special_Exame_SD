@@ -4,6 +4,7 @@ exports.up = function(knex) {
     table.increments('id').primary();
     table.string('username').notNullable();
     table.string('email').notNullable().unique();
+    table.string('password').notNullable().unique();
     table.timestamps(true, true); // adiciona colunas created_at e updated_at
   });
 };
