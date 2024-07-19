@@ -1,33 +1,26 @@
 // Imports
-const express = require('express');
+const userService = require('../services/user.service')
+const UserModel = require('../models/user.model')
 
-const router = express.Router();
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userService.getAllUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).send('Error retrieving users');
+  }
+};
 
-const User = require('../services/user.service');
+const verifyRegister = async (req, res) => {
+  try {
+    const { username, password } = req.body
+    console.log(username, password)
+    
+    await userService.register(username, password)
+    res.status(200).json({ message: 'User make a sucefull sign-up' })
+  } catch (error) {
 
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.getAllUsers();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+  }
+}
 
-// const getUserById = async (req, res) => {
-//     try {
-//         const user = await userService.getUserById(req.params.id);
-//         if (user) {
-//             res.json(user);
-//         } else {
-//             res.status(404).send('User not found');
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Error retrieving user');
-//     }
-// };
-
-// Add more controllers as needed
-
-module.exports = router;
+module.exports = { getAllUsers, verifyRegister };

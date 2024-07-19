@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const userController = require('./controllers/user.controller');
+const router = require('./routes/routes');
 const knexConfig = require('./knexfile').db;
+const knex = require('knex')(knexConfig);
 
 const app = express();
 
@@ -12,12 +13,21 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// routes
-app.use(userController)
+app.use(router)
 
 app.get('/', async (req, res) => {
     res.send('Welcome auth API')
 })
+
+// app.get("/users", async (req, res) => {
+//     try {
+//         const users = await knex.select("*").from("users");
+//         res.json(users);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send("Error retrieving data");
+//     }
+// });
 
 // app.get('/teachers', async (req, res) => {
 //     try {
