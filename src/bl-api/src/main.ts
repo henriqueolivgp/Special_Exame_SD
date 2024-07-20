@@ -5,7 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
-  const port = process.env.BL_API_PORT || 7080;
+  const port = process.env.BL_API_PORT || 8080;
   const portSwagger = process.env.SWAGGER_PORT;
 
   const config = new DocumentBuilder()
