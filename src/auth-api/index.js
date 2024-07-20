@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const router = require('./routes/routes');
 const knexConfig = require('./knexfile').db;
 const knex = require('knex')(knexConfig);
+const cookieParser = require('cookie-parser')
 
 const app = express();
 
@@ -12,32 +13,13 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use(router)
 
 app.get('/', async (req, res) => {
     res.send('Welcome auth API')
 })
-
-// app.get("/users", async (req, res) => {
-//     try {
-//         const users = await knex.select("*").from("users");
-//         res.json(users);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send("Error retrieving data");
-//     }
-// });
-
-// app.get('/teachers', async (req, res) => {
-//     try {
-//         const teachers = await knex.select('*').from('teachers');
-//         res.json(teachers);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Error retrieving data');
-//     }
-// });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

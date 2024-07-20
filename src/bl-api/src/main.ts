@@ -9,10 +9,10 @@ async function bootstrap() {
   const portSwagger = process.env.SWAGGER_PORT;
 
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('Movies')
+    .setDescription('')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('')
     .build();
 
   try {
