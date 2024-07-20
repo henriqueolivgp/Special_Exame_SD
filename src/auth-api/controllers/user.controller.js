@@ -14,8 +14,8 @@ const getAllUsers = async (req, res) => {
 
 const verifyRegister = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    console.log(username, password)
+    const { username, password,  } = req.body;
+    // console.log(username, password)
 
     await userService.register(username, password)
     res.status(200).json({ message: 'User make a sucefull sign-up' })
