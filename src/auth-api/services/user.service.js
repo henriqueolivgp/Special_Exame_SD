@@ -74,27 +74,82 @@ const login = async (username, password) => {
     }
 };
 
-// const updateUser = async () => {
-//     try {
-//         const user = await knex('users').where({ id: userId }).first();
-//         if (!user) {
-//             throw new Error('User not found');
-//         }
+const logOut = async (res) => {
+    try {
+        res.clearCookie('token');
+        return { message: 'Logout successful' };
+    } catch (error) {
+        throw new Error('Error in logOut User')
+    }
+}
 
-//         const userUpdate = {
-//             uername: ,
-//             password: ,
-//             role: ,
-//         }
+const updateUser = async (id, newUsername, newRole) => {
+    try {
+        console.log('Inicio update de utilizador');
 
-//     } catch (error) {
-        
-//     }
-// }
+        // Verifica se o novo nome de usuário já está em uso
+        console.log('A verificar se o novo nome de utilizador já está em uso');
+        const existingUser = await knex('users').where({ username: newUsername }).first();
+        if (existingUser && existingUser.id !== id) {
+            throw new Error('Este nome de utilizador já está em uso.');
+        }
+
+        const role = await knex('roles').where({ typeRole: newRole }).first('id');
+        if (!role) {
+            throw new Error('Role não encontrado.');
+        }
+        console.log(role.id)
+        console.log(newUsername)
+        console.log('id: ' + id)
+
+        const userExists = await knex('users').where({ id: id }).first();
+        if (!userExists) {
+            throw new Error('Utilizador não encontrado.');
+        }
+        console.log('User encontrado com o id:' + id)
+
+        // Atualiza o usuário no banco de dados
+        console.log('A atualizar utilizador no banco de dados');
+        const updated = await knex('users')
+            .where({ id: id })
+            .update({
+                username: newUsername,
+                role_id: role.id,
+            });
+
+        if (updated === 0) {
+            throw new Error('Nenhum utilizador foi encontrado para atualizar.');
+        }
+
+        console.log('Utilizador atualizado com sucesso');
+        return { message: 'User updated successfully' };
+    } catch (error) {
+        console.error('Erro ao atualizar utilizador:', error.message);
+        throw new Error('Error updating user: ' + error.message);
+    }
+};
+
+
+
+// service
+const deleteUser = async (id) => {
+    try {
+        const user = await knex('users').where({ id: id }).del();
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return { message: 'User has been deleted successfully' };
+    } catch (error) {
+        throw new Error('Error in deleting user');
+    }
+};
+
 
 module.exports = {
     getAllUsers,
     register,
     login,
-    update
+    logOut,
+    updateUser,
+    deleteUser,
 };

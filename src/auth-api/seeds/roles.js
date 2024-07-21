@@ -4,7 +4,6 @@
  */
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
-  await knex('roles').del()
   await knex('roles').insert([
     { typeRole: 'admin'},
     { typeRole: 'edit'},

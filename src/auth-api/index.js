@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const router = require('./routes/routes');
-const knexConfig = require('./knexfile').db;
-const knex = require('knex')(knexConfig);
+// const knexConfig = require('./knexfile').db;
+// const knex = require('knex')(knexConfig);
 const cookieParser = require('cookie-parser')
+const verifyAuth = require('./middleware/verifyAuth')
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use(verifyAuth);
 app.use(router)
 
 app.get('/', async (req, res) => {

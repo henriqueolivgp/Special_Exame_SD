@@ -22,7 +22,8 @@ function verifyAuth(req, res, next) {
     }
 
     // Adiciona o id do usuário ao objeto `req`
-    req.user = decoded.sub;
+    req.user = { id: decoded.sub };
+    // console.log(req.user)
 
     // Chama o próximo middleware ou a rota
     next();

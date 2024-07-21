@@ -14,7 +14,7 @@ const getAllUsers = async (req, res) => {
 
 const verifyRegister = async (req, res) => {
   try {
-    const { username, password,  } = req.body;
+    const { username, password, } = req.body;
     // console.log(username, password)
 
     await userService.register(username, password)
@@ -40,4 +40,42 @@ const verifyLogin = async (req, res) => {
   }
 }
 
-module.exports = { getAllUsers, verifyRegister, verifyLogin };
+const verifyLogOut = async (req,res) => {
+  try {
+    const result = userService.logOut(res);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Logout failed' });
+  }
+}
+
+const verifyUpdateUser = async (req, res) => {
+  const { id } = req.params
+  const { newUsername, newRole } = req.body;
+
+  // Verifica se todos os campos necessários foram fornecidos
+  if ( !newUsername || !newRole) {
+      return res.status(400).json({ message: 'Todos os campos são necessários' });
+  }
+
+  try {
+      const result = await userService.updateUser(id, newUsername, newRole);
+      return res.status(200).json(result);
+  } catch (error) {
+      return res.status(500).json({ message: error.message });
+  }
+};
+
+// controller
+const deleteUser = async (req, res) => {
+  const { id: userId } = req.params; // Corrigido para corresponder ao nome do parâmetro na rota
+  try {
+    const result = await userService.deleteUser(userId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports = { getAllUsers, verifyRegister, verifyLogin, verifyLogOut, verifyUpdateUser, deleteUser };
