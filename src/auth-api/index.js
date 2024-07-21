@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const router = require('./routes/routes');
+const router = require('./routes/user.routes');
 // const knexConfig = require('./knexfile').db;
 // const knex = require('knex')(knexConfig);
 const cookieParser = require('cookie-parser')
-const verifyAuth = require('./middleware/verifyAuth')
+const verifyAuth = require('./middleware/verifyAuth');
+const { authRoutes } = require('./routes/auth.routes');
 
 const app = express();
 
@@ -15,6 +16,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use(authRoutes)
 
 app.use(verifyAuth);
 app.use(router)
