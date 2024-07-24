@@ -2,10 +2,10 @@ const authService = require('../services/auth.service')
 
 const verifyRegister = async (req, res) => {
   try {
-    const { username, password, } = req.body;
-    // console.log(username, password)
+    const { username, password, role = 'admin' } = req.body;
+    console.log(username, password, role)
 
-    await authService.register(username, password)
+    await authService.register(username, password, role)
     res.status(200).json({ message: 'User make a sucefull sign-up' })
   } catch (error) {
     res.status(400).json({ error: error.message });

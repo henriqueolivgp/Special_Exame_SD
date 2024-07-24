@@ -13,8 +13,11 @@ const app = express();
 
 // configs
 
-app.use(cors());
 app.use(bodyParser.json());
+app.use(cors({
+    origin: '*', // Substitua pelo domínio da sua API Nest
+    credentials: true
+  }));
 app.use(cookieParser());
 
 app.use(authRoutes)

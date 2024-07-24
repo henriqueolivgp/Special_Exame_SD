@@ -18,13 +18,13 @@ function verifyRoles(requiredRoles) {
       }
 
       // Obtém o tipo de papel do usuário a partir da tabela 'roles'
-      const role = await knex('roles').where({ id: user.role_id }).first();
+      const role = await knex('users').where({ role: user.role }).first();
       if (!role) {
         return res.status(403).json({ error: 'Role not found' });
       }
 
       // Verifica se o tipo de papel está entre os papéis exigidos
-      if (!requiredRoles.includes(role.typeRole)) {
+      if (!requiredRoles.includes(user.role)) {
         return res.status(403).json({ error: 'Access denied' });
       }
 

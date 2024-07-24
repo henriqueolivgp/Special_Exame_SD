@@ -3,10 +3,11 @@ const knexConfig = require('../knexfile').db;
 const knex = require('knex')(knexConfig);
 const jwt = require('jsonwebtoken');
 
-const register = async (username, password) => {
+const validRoles = ['admin', 'view', 'edit'];
+
+const register = async (username, password, role = 'admin') => {
   try {
     console.log('A comecar registro de utilizador'); // Log de início
-
     // Verifica se o usuário já existe
     console.log('Verificando se o usuário já existe');
     const existingUser = await knex('users').where({ username }).first();
@@ -14,19 +15,19 @@ const register = async (username, password) => {
       throw new Error('Este username já está em uso.');
     }
 
+    if (!validRoles.includes(role)) {
+      throw new Error('Role inválido. Os roles permitidos são: admin, view, edit.');
+    }
     // Cria o hash da senha em sha256
     console.log('A criar a hash da senha fornecida');
     const passwordHashed = crypto.createHash('sha256').update(password).digest('hex');
-
-    const [role] = await knex('roles').where({ typeRole: 'view' }).select('id');
-    const roleId = role.id;
 
     // Insere o novo usuário no banco de dados
     console.log('A inserir utilizador na bd');
     await knex('users').insert({
       username,
       password: passwordHashed,
-      role_id: roleId,
+      role: role,
     });
 
     console.log('Usuário registrado com sucesso'); // Log de sucesso
@@ -44,6 +45,7 @@ const login = async (username, password) => {
     if (!user) {
       throw new Error('Invalid credentials');
     }
+    console.log()
 
     // Hash da senha fornecida e comparação com a senha armazenada
     console.log('Criando hash da senha para comparação');
@@ -55,8 +57,16 @@ const login = async (username, password) => {
 
     console.log('Usuário autenticado com sucesso'); // Log de sucesso
 
-    const token = jwt.sign({}, 'sd', { expiresIn: '1d', subject: user.id.toString() });
-    // console.log(token);
+    console.log(user.role)
+
+    // craicao de um objeto que vai conter algun dados importantes do utilizador
+    const tokenPayload = {
+      role: user.role,
+    }
+
+    const token = jwt.sign({ tokenPayload }, 'sd', { expiresIn: '1d', subject: user.id.toString() });
+    console.log(token);
+    
     return { token, user };
   } catch (error) {
     console.error('Erro ao fazer login:', error.message); // Log de erro

@@ -7,7 +7,7 @@ exports.up = function(knex) {
     table.increments('id').primary();
     table.string('username').notNullable().unique();
     table.string('password').notNullable();
-    table.integer('role_id').unsigned().references('id').inTable('roles').onDelete('SET NULL');
+    table.string('role').unique();
     table.timestamps(true, true); // adiciona colunas created_at e updated_at
   });
 };
@@ -17,6 +17,6 @@ exports.up = function(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-// exports.down = function(knex) {
+exports.down = function(knex) {
 
-// };
+};
