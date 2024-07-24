@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -17,7 +18,11 @@ async function bootstrap() {
 
   try {
     const app = await NestFactory.create(AppModule, { cors: true });
-    app.enableCors();
+    app.enableCors({
+      origin: '*', // Substitua pelo domínio da sua API Express
+      credentials: true,
+    });
+    app.use(cookieParser());
 
     await app.listen(port, () => {
       const address = `http://localhost:${port}`;
