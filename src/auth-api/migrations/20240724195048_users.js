@@ -7,7 +7,7 @@ exports.up = function(knex) {
     table.increments('id').primary();
     table.string('username').notNullable().unique();
     table.string('password').notNullable();
-    table.string('role').unique();
+    table.string('role');
     table.timestamps(true, true); // adiciona colunas created_at e updated_at
   });
 };

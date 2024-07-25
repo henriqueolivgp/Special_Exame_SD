@@ -75,6 +75,31 @@ const MoviesUpdateSchema = z.object({
 
 type MovieUpdate = z.infer<typeof MoviesUpdateSchema>;
 
+const CastsSchema = z.object({
+  cast_id: z.coerce.number().optional(),
+  name: z.string(),
+});
+const GenresSchema = z.object({
+  genres_id: z.coerce.number().optional(),
+  name: z.string().optional(),
+});
+const MoviesCastSchema = z.object({
+  title: z.string().optional(),
+  year: z.coerce.number().optional(),
+  cast: CastsSchema.optional(),
+  genres: GenresSchema.optional(),
+  href: z.string().optional(),
+  extract: z.string().optional(),
+  thumbnail: z.string().optional(),
+  thumbnail_width: z.coerce.number().optional(),
+  thumbnail_height: z.coerce.number().optional(),
+});
+type MoviesCasts = z.infer<typeof MoviesCastSchema>;
+
+type Casts = z.infer<typeof CastsSchema>;
+
+type Genres = z.infer<typeof GenresSchema>;
+
 export {
   MoviesSchema,
   Movie,
@@ -85,4 +110,10 @@ export {
   MoviesUpdateSchema,
   MovieUpdate,
   MovieUpdateIdSchema,
+  Casts,
+  CastsSchema,
+  Genres,
+  GenresSchema,
+  MoviesCasts,
+  MoviesCastSchema,
 };

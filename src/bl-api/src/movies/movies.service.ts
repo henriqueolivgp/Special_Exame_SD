@@ -8,6 +8,8 @@ import {
   MoviesUpdateSchema,
   MovieUpdate,
   MovieUpdateIdSchema,
+  Casts,
+  Genres,
 } from '../models/movies.model';
 import { Prisma } from '@prisma/client';
 
@@ -185,6 +187,110 @@ export class MoviesService {
     } catch (error) {
       console.error('Error ao apagar um filme:', error);
       throw new Error('Error ao apagar um filme: ' + JSON.stringify(error));
+    }
+  }
+
+  async findCastsByMovieId(movie_id: number): Promise<Casts[]> {
+    try {
+      const movie = await this.prisma.movies.findUnique({
+        where: {
+          movie_id: movie_id,
+        },
+        include: {
+          cast: true,
+        },
+      });
+
+      if (!movie) {
+        throw new NotFoundException(`Movie with id ${movie_id} not found`);
+      }
+
+      const casts = await this.prisma.casts.findMany({
+        where: {
+          cast_id: movie.cast.cast_id,
+        },
+      });
+      console.log('casts: ' + casts);
+
+      // Assegura que movie.cast é um array
+      return casts || [];
+    } catch (error) {
+      throw new Error(
+        `Error fetching casts for movie ${movie_id}: ${error.message}`,
+      );
+    }
+  }
+
+  async findGenresByMovieId(movie_id: number): Promise<Genres[]> {
+    try {
+      const movie = await this.prisma.movies.findUnique({
+        where: {
+          movie_id: movie_id,
+        },
+        include: {
+          genres: true, // Inclui os gêneros associados ao filme
+        },
+      });
+
+      if (!movie) {
+        throw new NotFoundException(`Movie with id ${movie_id} not found`);
+      }
+
+      // Verifica se genres é um array ou um único objeto
+      const genres = Array.isArray(movie.genres)
+        ? movie.genres
+        : [movie.genres];
+
+      // Processa cada genre para garantir que name é uma string simples
+      const processedGenres = genres.map((genre) => ({
+        genres_id: genre.genres_id,
+        name:
+          typeof genre.name === 'string' ? genre.name : JSON.parse(genre.name),
+      }));
+
+      return processedGenres;
+    } catch (error) {
+      throw new Error(
+        `Error fetching genres for movie ${movie_id}: ${error.message}`,
+      );
+    }
+  }
+
+  // Atualizar um cast específico
+  async updateCast(
+    movie_id: number,
+    cast_id: number,
+    castData: Partial<Casts>,
+  ): Promise<Casts> {
+    try {
+      const movie = await this.prisma.movies.findUnique({
+        where: { movie_id },
+        include: { cast: true },
+      });
+
+      if (!movie) {
+        throw new NotFoundException(`Movie with id ${movie_id} not found`);
+      }
+
+      const casts = Array.isArray(movie.cast) ? movie.cast : [movie.cast];
+      const cast = casts.find((c) => c.cast_id === cast_id);
+
+      if (!cast) {
+        throw new NotFoundException(
+          `Cast with id ${cast_id} not found for movie ${movie_id}`,
+        );
+      }
+
+      const updatedCast = await this.prisma.casts.update({
+        where: { cast_id },
+        data: castData,
+      });
+
+      return updatedCast;
+    } catch (error) {
+      throw new Error(
+        `Error updating cast ${cast_id} for movie ${movie_id}: ${error.message}`,
+      );
     }
   }
 }

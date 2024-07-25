@@ -10,6 +10,9 @@ import {
 } from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import {
+  Casts,
+  CastsSchema,
+  Genres,
   Movie,
   MovieId,
   MovieIdSchema,
@@ -28,12 +31,14 @@ export class MoviesController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'user') // Permitir que tanto administradores quanto usuários comuns possam visualizar todos os filmes
+  @Roles('admin', 'view')
   async findAll(): Promise<Movie[]> {
     return this.moviesService.findMany();
   }
 
   @Get(':movie_id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'view')
   async findUnique(@Param('movie_id') movie_id: number): Promise<MovieId> {
     try {
       const { movie_id: validatedMovieId } = MovieIdSchema.parse({ movie_id });
@@ -46,6 +51,8 @@ export class MoviesController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async create(@Body() movies: MovieInsert) {
     try {
       // Valida o input conforme o schema Zod
@@ -62,6 +69,8 @@ export class MoviesController {
   }
 
   @Put(':movie_id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'edit')
   async updateMovie(
     @Param('movie_id') movie_id: number,
     @Body() movie: MovieUpdate,
@@ -84,6 +93,8 @@ export class MoviesController {
   }
 
   @Delete(':movie_id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async remove(@Param('movie_id') movie_id: number): Promise<void> {
     try {
       const { movie_id: validatedMovieId } = MovieIdSchema.parse({ movie_id });
@@ -92,5 +103,41 @@ export class MoviesController {
       console.error('Error ao apagar o filme:', error);
       throw new Error('Error ao apagar movie');
     }
+  }
+
+  @Get(':movie_id/casts')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'view')
+  async getCasts(@Param('movie_id') movie_id: number): Promise<Casts[]> {
+    const { movie_id: validatedMovieId } = MovieIdSchema.parse({ movie_id });
+    return this.moviesService.findCastsByMovieId(validatedMovieId);
+  }
+
+  @Get(':movie_id/genres')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'view')
+  async getGenres(@Param('movie_id') movie_id: number): Promise<Genres[]> {
+    const { movie_id: validatedMovieId } = MovieIdSchema.parse({ movie_id });
+    return this.moviesService.findGenresByMovieId(validatedMovieId);
+  }
+
+  @Put(':movie_id/casts/:cast_id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'edit')
+  async updateCast(
+    @Param('movie_id') movie_id: number,
+    @Param('cast_id') cast_id: number,
+    @Body() castData: Partial<Casts>,
+  ): Promise<Casts> {
+    const { movie_id: validatedMovieId } = MovieIdSchema.parse({ movie_id });
+    const { cast_id: validatedCastId } = CastsSchema.pick({
+      cast_id: true,
+    }).parse({ cast_id });
+    const validatedCast = CastsSchema.partial().parse(castData);
+    return this.moviesService.updateCast(
+      validatedMovieId,
+      validatedCastId,
+      validatedCast,
+    );
   }
 }
