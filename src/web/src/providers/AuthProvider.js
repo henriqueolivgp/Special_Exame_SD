@@ -2,25 +2,50 @@ import { AuthContext } from '../contexts/AuthContext'
 import { useState, useEffect } from 'react'
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // const [session, setSession] = useState(null);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   // const url = 'localhost:18080';
 
   useEffect(() => {
-    const userCookie = Cookies.get('user');
-    console.log('userCookies: ' + userCookie)
-    if (userCookie) {
-      setUser(JSON.parse(userCookie));
+    const userToken = Cookies.get('authToken');
+    // console.log('userCookies: ' + userToken);
+
+    if (userToken) {
+      try {
+        const decodedToken = jwtDecode(userToken,);
+        // console.log('Decoded Token: ', decodedToken);
+
+        // Verificar se o token contém userId
+        if (decodedToken.sub) {
+          // console.log('User ID: ', decodedToken.sub);
+          // const userId = decodedToken.sub;
+          // setSession(userId)
+          // Faça o que for necessário com o userId
+        } else {
+          console.log('User ID não encontrado no token');
+        }
+
+      } catch (error) {
+        console.error('Erro ao decodificar o token:', error);
+      }
+    } else {
+      console.log('Token não encontrado nos cookies');
     }
-    setLoading(false); // Após verificar os cookies, definimos o loading como false
+    
+    // if (session === null) {
+    //   return console.log('nao ha user' + session)
+    // }
   }, []);
 
   const register = async (userData) => {
-    setLoading(true);
     setError(null);
     try {
       console.log('userData antes de inserir: ' + JSON.stringify(userData))
@@ -35,12 +60,10 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       setError(err.response ? err.response.data : 'Erro de rede');
     } finally {
-      setLoading(false);
     }
   };
 
   const login = async (credentials) => {
-    setLoading(true);
     setError(null);
     try {
       const { username, password } = credentials;
@@ -49,16 +72,25 @@ export const AuthProvider = ({ children }) => {
         password
       });
       setUser(response.data);
+
+      // console.log(response.data)
+
+      const token = response.data.token;
+
+      Cookies.set('authToken', token, { expires: 1 });
+
     } catch (err) {
       setError(err.response ? err.response.data : 'Erro de rede');
     } finally {
-      setLoading(false);
     }
   };
 
   const logout = () => {
-    // Implementar a lógica de logout
+    // Remove o token de autenticação dos cookies
+    Cookies.remove('authToken');
+    // Atualizar o estado do usuário para 
     setUser(null);
+    navigate('/')
   };
 
   return (

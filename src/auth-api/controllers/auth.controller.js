@@ -21,7 +21,7 @@ const verifyLogin = async (req, res) => {
     res.cookie('token', token, { httpOnly: true });
     // console.log('depois dos cookies')
 
-    res.status(200).json({ message: 'User successfully logged in', user });
+    res.status(200).json({ message: 'User successfully logged in', token, user });
   } catch (error) {
     // console.error('Erro ao fazer login:', error.message);
     res.status(400).json({ error: error.message });
