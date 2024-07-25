@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { RouterProvider } from "react-router-dom";
 import { router } from './routes';
+import { AuthProvider } from './providers/AuthProvider';
+import { ToastContainer } from 'react-toastify';
 
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
@@ -17,7 +19,10 @@ root.render(
     <React.StrictMode>
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
-            <RouterProvider router={router} />
+            <AuthProvider>
+                <RouterProvider router={router} />
+                <ToastContainer />
+            </AuthProvider>
         </ThemeProvider>
     </React.StrictMode>
 );

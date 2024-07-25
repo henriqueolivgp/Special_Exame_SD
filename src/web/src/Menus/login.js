@@ -1,7 +1,22 @@
 import { ChevronLeft } from 'lucide-react'
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/AuthHook';
+import { useState } from 'react';
+import { toast } from 'react-toastify'
 
 export function Login() {
+  const { login, error } = useAuth();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await login({username, password});
+
+    console.log('data do front' + username, password)
+
+    toast.error(error)
+  };
   return (
     <>
       <div className="container mx-auto bg-slate-700 h-full ">
@@ -23,18 +38,19 @@ export function Login() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form className="space-y-6" action="#" method="POST">
+              <form onSubmit={handleSubmit} className="space-y-6" action="#" method="POST">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium leading-6 text-white">
                     Email address
                   </label>
                   <div className="mt-2">
                     <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder='email@example.com'
+                      id="username"
+                      name="username"
+                      type="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder='username....'
                       required
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
@@ -52,7 +68,8 @@ export function Login() {
                       id="password"
                       name="password"
                       type="password"
-                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder='*******'
                       required
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
