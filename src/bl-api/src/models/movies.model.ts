@@ -1,5 +1,3 @@
-// src/movies/movie.model.ts
-
 import { z } from 'zod';
 
 const MoviesSchema = z.object({
