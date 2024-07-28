@@ -21,7 +21,7 @@ import {
   MoviesUpdateSchema,
   MovieUpdate,
 } from '../models/movies.model';
-import { JwtAuthGuard } from 'src/jwt./jwt.auth.guard';
+import { JwtAuthGuard } from 'src/jwt/jwt.auth.guard';
 import { RolesGuard } from '../middlewares/VerifyRoles';
 import { Roles } from 'src/decorator/rolesDecorator';
 
