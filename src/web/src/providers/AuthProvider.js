@@ -1,49 +1,40 @@
 import { AuthContext } from '../contexts/AuthContext'
-import { useState, useEffect } from 'react'
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react'
+
+import axios from 'axios';
+
+import Cookies from 'js-cookie';
+import { jwtDecode as jwt_decode } from 'jwt-decode';
+
+import { toast } from 'react-toastify';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  // const [session, setSession] = useState(null);
+  const [signed, setSigned] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
-  // const url = 'localhost:18080';
-
   useEffect(() => {
-    const userToken = Cookies.get('authToken');
-    // console.log('userCookies: ' + userToken);
+    const userIsSigned = async () => {
+      const CookieToken = Cookies.get('token');
 
-    if (userToken) {
-      try {
-        const decodedToken = jwtDecode(userToken,);
-        // console.log('Decoded Token: ', decodedToken);
-
-        // Verificar se o token contém userId
-        if (decodedToken.sub) {
-          // console.log('User ID: ', decodedToken.sub);
-          // const userId = decodedToken.sub;
-          // setSession(userId)
-          // Faça o que for necessário com o userId
-        } else {
-          console.log('User ID não encontrado no token');
-        }
-
-      } catch (error) {
-        console.error('Erro ao decodificar o token:', error);
+      if (typeof CookieToken === 'string' && CookieToken) {
+        const User = jwt_decode(CookieToken);
+        setUser(User);
+        setSigned(!!User);
+        setLoading(false)
+      } else {
+        setUser(null);
+        setSigned(false);
       }
-    } else {
-      console.log('Token não encontrado nos cookies');
+      setLoading(false);
+
     }
-    
-    // if (session === null) {
-    //   return console.log('nao ha user' + session)
-    // }
-  }, []);
+    userIsSigned()
+  }, [signed]);
 
   const register = async (userData) => {
     setError(null);
@@ -67,34 +58,40 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const { username, password } = credentials;
+
+      // faco pedido a minha auth api para fazer login
       const response = await axios.post('http://localhost:18080/login', {
         username,
         password
       });
+
       setUser(response.data);
 
-      // console.log(response.data)
+      // console.log("data do login: " + JSON.stringify(response.data))
 
       const token = response.data.token;
 
-      Cookies.set('authToken', token, { expires: 1 });
+      // gerar o token com onome "token"
+      Cookies.set('token', token, { expires: 1 });
+      toast.success("You logged in!!")
 
+      navigate("/")
     } catch (err) {
       setError(err.response ? err.response.data : 'Erro de rede');
-    } finally {
+      toast.error("Ocurred an error when you trying make login!!!! Pls verify you username or password")
     }
   };
 
   const logout = () => {
     // Remove o token de autenticação dos cookies
-    Cookies.remove('authToken');
+    Cookies.remove('token');
     // Atualizar o estado do usuário para 
     setUser(null);
-    navigate('/')
+    navigate("/")
   };
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout, error }}>
+    <AuthContext.Provider value={{ user, loading, signed, logout, register, login,  error }}>
       {children}
     </AuthContext.Provider>
   );
