@@ -31,14 +31,14 @@ export class MoviesController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'view')
+  @Roles('admin', 'view', 'edit')
   async findAll(): Promise<Movie[]> {
     return this.moviesService.findMany();
   }
 
   @Get(':movie_id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'view')
+  @Roles('admin', 'view', 'edit')
   async findUnique(@Param('movie_id') movie_id: number): Promise<MovieId> {
     try {
       const { movie_id: validatedMovieId } = MovieIdSchema.parse({ movie_id });
