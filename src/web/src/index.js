@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './themes/index.css';
 import { RouterProvider } from "react-router-dom";
-import { router } from './routes';
-import { AuthProvider } from './providers/AuthProvider';
+import { router } from './routes/routes';
+
+
+import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from 'react-toastify';
 
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
@@ -14,15 +16,17 @@ const darkTheme = createTheme({
     },
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
+
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
-            <AuthProvider>
-                <RouterProvider router={router} />
-                <ToastContainer />
-            </AuthProvider>
+
+            <RouterProvider router={router} />
+
+            <ToastContainer />
+
         </ThemeProvider>
+
     </React.StrictMode>
 );
