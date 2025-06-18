@@ -4,8 +4,6 @@ import { Navigate } from 'react-router-dom'
 export function PrivateRoutes ({ element, notHaveAccessNavigateTo }) {
   const { signed, loading } = useAuth()
 
-  // console.log("loading no private routes: " + loading) // true
-
   if(loading) {
     return <p>Loading Page.....</p>
   }
