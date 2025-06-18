@@ -45,14 +45,13 @@ const login = async (username, password) => {
     if (!user) {
       throw new Error('Invalid credentials');
     }
-    console.log()
 
     // Hash da senha fornecida e comparação com a senha armazenada
     console.log('Criando hash da senha para comparação');
     const passwordHashed = crypto.createHash('sha256').update(password).digest('hex');
 
     if (user.password !== passwordHashed) {
-      throw new Error('Invalid credentials');
+      throw new Error('Invalid password. Pls try again or resete you password');
     }
 
     console.log('Usuário autenticado com sucesso'); // Log de sucesso
@@ -69,7 +68,6 @@ const login = async (username, password) => {
     
     return { token, user };
   } catch (error) {
-    console.error('Erro ao fazer login:', error.message); // Log de erro
     throw new Error('Error during login: ' + error.message);
   }
 };
