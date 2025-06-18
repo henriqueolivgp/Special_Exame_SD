@@ -43,7 +43,7 @@ const login = async (username, password) => {
 
     const user = await knex('users').where({ username }).first();
     if (!user) {
-      throw new Error('Invalid credentials');
+         Error('Invalid username, this username dont exists');
     }
 
     // Hash da senha fornecida e comparação com a senha armazenada
@@ -68,7 +68,7 @@ const login = async (username, password) => {
     
     return { token, user };
   } catch (error) {
-    throw new Error('Error during login: ' + error.message);
+    throw new Error(error);
   }
 };
 

@@ -78,9 +78,11 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       setError(err.response ? err.response.data : 'Erro de rede');
-      toast.error(error.error);
+      console.log('Error: ' + err)
+      toast.error(error.error || err.response?.data?.error);
       return false;
     }
+
   };
 
   const logout = () => {
