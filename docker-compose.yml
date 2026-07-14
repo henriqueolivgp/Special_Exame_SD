@@ -6,8 +6,7 @@ services:
     build: docker/images/db
     volumes:
       - auth_data:/var/lib/postgresql/data/
-    ports:
-      - "$AUTH_DB_PORT:5432"
+  
     networks:
       - auth
 
@@ -19,8 +18,6 @@ services:
       - common
     volumes:
       - ./src/auth-api:/app
-    ports:
-      - "$AUTH_API_PORT:70"
     environment:
       - USE_DEV_MODE
       - PORT=70
@@ -30,8 +27,6 @@ services:
     build: docker/images/db
     volumes:
       - bl_data:/var/lib/postgresql/data/
-    ports:
-      - "$BL_DB_PORT:5432"
     networks:
       - bl
 
@@ -43,9 +38,7 @@ services:
       - common
     volumes:
       - ./src/bl-api:/app
-    ports:
-      - "$BL_API_PORT:8080"
-      - "$SWAGGER_PORT:8081"
+        - "$SWAGGER_PORT:8081"
     environment:
       - USE_DEV_MODE
       - PORT=8080
@@ -70,8 +63,6 @@ services:
       - common
     volumes:
       - ./src/web:/app
-    ports:
-      - "$FRONTEND_PORT:70"
     environment:
       - USE_DEV_MODE
       - PORT=70
