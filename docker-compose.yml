@@ -6,18 +6,17 @@ services:
     build: docker/images/db
     volumes:
       - auth_data:/var/lib/postgresql/data/
-  
     networks:
       - auth
 
   auth-api:
     container_name: auth-api
-    build: docker/images/javascript
+    build: 
+      context: ./src/auth-api
+      dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - auth
       - common
-    volumes:
-      - ./src/auth-api:/app
     environment:
       - USE_DEV_MODE
       - PORT=70
@@ -32,13 +31,12 @@ services:
 
   bl-api:
     container_name: bl-api
-    build: docker/images/javascript
+    build: 
+      context: ./src/bl-api
+      dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - bl
       - common
-    volumes:
-      - ./src/bl-api:/app
-        - "$SWAGGER_PORT:8081"
     environment:
       - USE_DEV_MODE
       - PORT=8080
@@ -47,22 +45,23 @@ services:
 
   importer:
     container_name: importer
-    build: docker/images/javascript
+    build: 
+      context: ./src/importer
+      dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - bl
     volumes:
-      - ./docker/volumes/importer:/data
-      - ./src/importer:/app
+      - importer_data:/data
     environment:
       - USE_DEV_MODE
 
   frontend:
     container_name: frontend
-    build: docker/images/javascript
+    build: 
+      context: ./src/web
+      dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - common
-    volumes:
-      - ./src/web:/app
     environment:
       - USE_DEV_MODE
       - PORT=70
@@ -79,3 +78,4 @@ networks:
 volumes:
   auth_data:
   bl_data:
+  importer_data:
