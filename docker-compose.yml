@@ -62,6 +62,8 @@ services:
       dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - common
+    expose:           #expose 70 port for frontendqq
+      - "70"
     environment:
       - USE_DEV_MODE
       - PORT=70
