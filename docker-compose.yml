@@ -1,6 +1,5 @@
 version: "3.8"
 services:
-
   auth-db:
     container_name: auth-db
     build: docker/images/db
@@ -11,7 +10,7 @@ services:
 
   auth-api:
     container_name: auth-api
-    build: 
+    build:
       context: ./src/auth-api
       dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
@@ -31,12 +30,14 @@ services:
 
   bl-api:
     container_name: bl-api
-    build: 
+    build:
       context: ./src/bl-api
       dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - bl
       - common
+    expose: 
+      - "8080"
     environment:
       - USE_DEV_MODE
       - PORT=8080
@@ -45,7 +46,7 @@ services:
 
   importer:
     container_name: importer
-    build: 
+    build:
       context: ./src/importer
       dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
@@ -57,17 +58,18 @@ services:
 
   frontend:
     container_name: frontend
-    build: 
+    build:
       context: ./src/web
       dockerfile: ../../docker/images/javascript/Dockerfile
     networks:
       - common
-    expose:           #expose 70 port for frontendqq
+    expose: #expose 70 port for frontendqq
       - "70"
     environment:
       - USE_DEV_MODE
       - PORT=70
-      - REACT_APP_API_URL=http://localhost:$BL_API_PORT
+      # - REACT_APP_API_URL=http://localhost:$BL_API_PORT
+      - REACT_APP_API_URL=http://bn5gme5x5rz9bbuejv062g79.51.170.48.125.sslip.io
 
 networks:
   common:
