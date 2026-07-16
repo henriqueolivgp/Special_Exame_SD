@@ -64,10 +64,10 @@ services:
     networks:
       - common
     expose: #expose 70 port for frontendqq
-      - "70"
+      - "3000"
     environment:
       - USE_DEV_MODE
-      - PORT=70
+      - PORT=3000
       # - REACT_APP_API_URL=http://localhost:$BL_API_PORT
       - REACT_APP_API_URL=http://bn5gme5x5rz9bbuejv062g79.51.170.48.125.sslip.io
 
