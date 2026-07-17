@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       console.log('userData antes de inserir: ' + JSON.stringify(userData))
       const { username, password } = userData;
       console.log('username: ' + username + ' password: ' + password)
-      const response = await axios.post(`http://${process.env.REACT_APP_API_URL}/register`, {
+      const response = await axios.post('http://localhost:18080/register', {
         username,
         password
       });
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       console.log('dados antes da requesicao:' + username + ' - ' + password)
 
       // make the request into my auth api for logged in
-      const response = await axios.post(`http://${process.env.REACT_APP_API_URL}/login`, {
+      const response = await axios.post('http://localhost:18080/login', {
         username,
         password
       });
