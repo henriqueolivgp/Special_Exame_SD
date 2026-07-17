@@ -22,8 +22,6 @@ const HelloWorld = {
 const JSONObserver = {
     list: async function () {
         console.log("Listing all available JSON files!");
-
-        // Atualiza para o novo nome da pasta
         const dataPath = path.join(__dirname, 'seed_movies');
 
         try {
@@ -36,6 +34,7 @@ const JSONObserver = {
             }
 
             for (const file of jsonFiles) {
+                // Passamos a pasta E o nome do ficheiro!
                 await this.processFile(dataPath, file);
             }
         } catch (error) {
@@ -43,16 +42,20 @@ const JSONObserver = {
         }
     },
 
-    processFile: function (fileName) {
+    // MUDANÇA 1: Agora recebe o "folder" e o "fileName"
+    processFile: async function (folder, fileName) {
         console.log(`Processing file: ${fileName}`);
-        const filePath = path.join("/data", fileName);
+
+        // MUDANÇA 2: Usamos a variável "folder" em vez de "/data" fixo!
+        const filePath = path.join(folder, fileName);
+
         const content = fs.readFileSync(filePath, 'utf8');
-        JSONObserver.parse(content);
+        await this.parse(content);
     },
 
     // Read the .json file and save the data into a variable
-    parse: function (content) {
-        console.log(`JSON Content of the file: \n${content}`);
+    parse: async function (content) {
+        console.log(`JSON Content read successfully, parsing data...`);
         try {
             const movies = JSON.parse(content).map(movie => ({
                 title: movie.title,
@@ -62,14 +65,12 @@ const JSONObserver = {
                 href: movie.href,
                 extract: movie.extract,
                 thumbnail: movie.thumbnail,
-                thumbnail_width: parseInt(movie.thumbnail_width) || null, // Convert to integer
-                thumbnail_height: parseInt(movie.thumbnail_height) || null // Convert to integer
+                thumbnail_width: parseInt(movie.thumbnail_width) || null,
+                thumbnail_height: parseInt(movie.thumbnail_height) || null
             }));
 
-            console.log(movies);
-            // Call the insert function once the data is stored in the variable
-            // This will insert all movies in the movies variable into the db
-            await = this.insertToDatabase(movies);
+            console.log(`Found ${movies.length} movies to insert.`);
+            await this.insertToDatabase(movies);
 
         } catch (err) {
             console.error(`Error parsing JSON: ${err}`);
@@ -80,6 +81,7 @@ const JSONObserver = {
     // Insert movies into the database
     insertToDatabase: async function (movies) {
         const client = new Client(dbConfig);
+        // ... (DAQUI PARA BAIXO O TEU CÓDIGO FICA EXATAMENTE IGUAL COMO ESTAVA)
         console.log('os filmes foram recebidos' + JSON.stringify(movies))
 
         try {
