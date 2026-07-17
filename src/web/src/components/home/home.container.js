@@ -23,26 +23,27 @@ function HomeContent() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["movies"],
+    retry: false, // <-- ISTO DESLIGA AS REPETIÇÕES AUTOMÁTICAS (Acaba o spam de Toasts!)
     queryFn: async () => {
+
+      console.log("Token lido dos cookies: ", token); // <-- Vê na consola se aparece um código gigante ou 'undefined'
 
       // request to fetch all movies
       const res = await fetch(`${process.env.REACT_APP_BL_API_URL}/movies`, {
         credentials: "include",
         headers: {
-          Authorization: `Bearer ${token}` // Envia o token para a API abrir a porta!
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // DICA: Se continuar a falhar, tenta tirar o "Bearer " e deixar só: `Authorization: token`
         }
       });
 
-      // console.log("entrei")
-
       if (!res.ok) {
         const errorText = await res.text();
-        toast.error(errorText)
+        toast.error(errorText);
         throw new Error("Sem permissão");
       }
 
       const data = await res.json();
-      console.log("Data: ", data);
       return data;
     },
     enabled: signed,
