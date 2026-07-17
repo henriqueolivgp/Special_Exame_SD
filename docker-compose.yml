@@ -54,7 +54,7 @@ services:
     networks:
       - bl
     volumes:
-      - importer_data:/data
+      - ./docker/volumes/importer/movies:/data # <-- A MÁGICA ESTÁ AQUI: Ligação direta à tua pasta!
     environment:
       - USE_DEV_MODE
 

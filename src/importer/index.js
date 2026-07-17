@@ -23,8 +23,8 @@ const JSONObserver = {
     list: async function () {
         console.log("Listing all available JSON files!");
 
-        // A MÁGICA ESTÁ AQUI: Ensina o script a navegar pelas tuas pastas até aos ficheiros
-        const dataPath = path.join(__dirname, '../../docker/volumes/importer/movies');
+        // VOLTAMOS AO INÍCIO: O Docker vai colocar os ficheiros todos nesta pasta
+        const dataPath = "/data";
 
         try {
             const files = fs.readdirSync(dataPath);
