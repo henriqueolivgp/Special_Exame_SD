@@ -23,8 +23,8 @@ const JSONObserver = {
     list: async function () {
         console.log("Listing all available JSON files!");
 
-        // MUDANÇA: Lê a pasta 'data' que está junto ao index.js
-        const dataPath = path.join(__dirname, 'data');
+        // Atualiza para o novo nome da pasta
+        const dataPath = path.join(__dirname, 'seed_movies');
 
         try {
             const files = fs.readdirSync(dataPath);
