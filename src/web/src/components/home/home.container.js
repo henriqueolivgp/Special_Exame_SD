@@ -21,7 +21,7 @@ function HomeContent() {
     queryFn: async () => {
 
       // request to fetch all movies
-      const res = await fetch("http://localhost:8080/movies", {
+      const res = await fetch(`${process.env.REACT_APP_BL_API_URL}/movies`, {
         credentials: "include"
       });
 

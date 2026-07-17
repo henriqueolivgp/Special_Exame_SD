@@ -20,7 +20,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule); // , { cors: true }
 
     app.enableCors({
-      origin: 'http://b72r7mi6l7yrh23zskd2o8ok.51.170.48.125.sslip.io',
+      origin: 'http://clh7d3f2zkrmq8wdahw04ocs.51.170.48.125.sslip.io',
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE'], // opcional, mas melhor que só GET
     });
