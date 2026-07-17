@@ -69,7 +69,7 @@ services:
       - USE_DEV_MODE
       - PORT=3000
       # - REACT_APP_API_URL=http://localhost:$BL_API_PORT
-      - BL_API_URL=${BL_API_URL}
+      # - BL_API_URL=${BL_API_URL}
 
 networks:
   common:
