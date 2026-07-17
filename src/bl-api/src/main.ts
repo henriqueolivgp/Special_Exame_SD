@@ -17,12 +17,12 @@ async function bootstrap() {
     .build();
 
   try {
-    const app = await NestFactory.create(AppModule); // , { cors: true }
+    const app = await NestFactory.create(AppModule);
 
     app.enableCors({
-      origin: 'http://clh7d3f2zkrmq8wdahw04ocs.51.170.48.125.sslip.io',
+      origin: true, // <-- A MÁGICA ESTÁ AQUI! (Reflete automaticamente a origem do pedido)
       credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE'], // opcional, mas melhor que só GET
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // OPTIONS é importante para pedidos preflight
     });
 
     app.use(cookieParser());
