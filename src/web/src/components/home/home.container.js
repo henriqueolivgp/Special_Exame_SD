@@ -12,9 +12,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/AuthHook"; // Supondo que useAuth retorna { session }
 import { toast } from "react-toastify";
 
+import Cookies from 'js-cookie'; // Não te esqueças de importar isto no topo!
+
+// ... lá mais para baixo, no teu pedido:
+
 function HomeContent() {
   const { signed } = useAuth(); // Ajuste conforme seu hook
   const [selectedMovie, setSelectedMovie] = useState("");
+  const token = Cookies.get('token'); // Vai buscar o token guardado no login
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["movies"],
@@ -22,10 +27,13 @@ function HomeContent() {
 
       // request to fetch all movies
       const res = await fetch(`${process.env.REACT_APP_BL_API_URL}/movies`, {
-        credentials: "include"
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}` // Envia o token para a API abrir a porta!
+        }
       });
 
-      console.log("entrei")
+      // console.log("entrei")
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -125,7 +133,7 @@ function HomeContent() {
       </Container>
 
       <Container
-      // className="w-[clac(100%-16rem)]"
+        // className="w-[clac(100%-16rem)]"
         sx={{
           backgroundColor: "info.dark",
           padding: "2rem",
