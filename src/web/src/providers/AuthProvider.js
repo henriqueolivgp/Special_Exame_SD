@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       console.log('dados antes da requesicao:' + username + ' - ' + password)
 
       // make the request into my auth api for logged in
-      const response = await axios.post('http://localhost:18080/login', {
+      const response = await axios.post(`${process.env.REACT_APP_AUTH_API_URL}/login`, {
         username,
         password
       });
