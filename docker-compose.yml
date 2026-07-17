@@ -16,9 +16,11 @@ services:
     networks:
       - auth
       - common
+    expose:
+      - "18080"
     environment:
       - USE_DEV_MODE
-      - PORT=70
+      - PORT=18080
 
   bl-db:
     container_name: bl-db
@@ -69,7 +71,8 @@ services:
       - USE_DEV_MODE
       - PORT=3000
       # - REACT_APP_API_URL=http://localhost:$BL_API_PORT
-      # - BL_API_URL=${BL_API_URL}
+      - BL_API_URL=${BL_API_URL}
+      - AUTH_API_URL=${AUTH_API_URL}
 
 networks:
   common:
