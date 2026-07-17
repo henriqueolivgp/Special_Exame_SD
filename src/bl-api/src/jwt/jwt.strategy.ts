@@ -1,30 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          if (request && request.cookies) {
-            const token = request.cookies['token'];
-            console.log('Token Extraído:', token);
-            return token;
-          }
-          return null;
-        },
-      ]),
+      // MUDANÇA AQUI: Diz ao NestJS para ir buscar o token ao cabeçalho Authorization
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), 
       ignoreExpiration: false,
-      secretOrKey: 'sd',
+      secretOrKey: 'sd', 
     });
   }
 
   async validate(payload: any) {
-    // console.log('Payload do Token:', payload);
-    // console.log('Payload do Role:', payload.tokenPayload.role);
     return { userId: payload.sub, roles: payload.tokenPayload.role };
   }
 }

@@ -17,10 +17,18 @@ export class RolesGuard implements CanActivate {
 
     const req = context.switchToHttp().getRequest();
 
-    const token = req.cookies.token;
+    // MUDANÇA AQUI: Lê o cabeçalho em vez dos cookies
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      throw new ForbiddenException('No token found');
+    }
+
+    // O cabeçalho vem como "Bearer eyJhb...", precisamos de separar a palavra Bearer do token real
+    const token = authHeader.split(' ')[1];
 
     if (!token) {
-      throw new ForbiddenException('No token found');
+      throw new ForbiddenException('Token format invalid');
     }
 
     try {
