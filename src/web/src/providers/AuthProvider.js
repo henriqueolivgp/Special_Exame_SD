@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       console.log('userData antes de inserir: ' + JSON.stringify(userData))
       const { username, password } = userData;
       console.log('username: ' + username + ' password: ' + password)
-      const response = await axios.post('http://localhost:18080/register', {
+      const response = await axios.post(`${process.env.REACT_APP_AUTH_API_URL}/register`, {
         username,
         password
       });
