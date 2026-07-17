@@ -23,8 +23,8 @@ const JSONObserver = {
     list: async function () {
         console.log("Listing all available JSON files!");
 
-        // VOLTAMOS AO INÍCIO: O Docker vai colocar os ficheiros todos nesta pasta
-        const dataPath = "/data";
+        // MUDANÇA: Lê a pasta 'data' que está junto ao index.js
+        const dataPath = path.join(__dirname, 'data');
 
         try {
             const files = fs.readdirSync(dataPath);
