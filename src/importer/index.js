@@ -20,13 +20,26 @@ const HelloWorld = {
 
 // JSONObserver module
 const JSONObserver = {
-    list: function () {
+    list: async function () {
         console.log("Listing all available JSON files!");
+
+        // A MÁGICA ESTÁ AQUI: Ensina o script a navegar pelas tuas pastas até aos ficheiros
+        const dataPath = path.join(__dirname, '../../docker/volumes/importer/movies');
+
         try {
-            const files = fs.readdirSync("/data");
-            files.filter(file => file.endsWith(".json")).forEach(this.processFile);
+            const files = fs.readdirSync(dataPath);
+            const jsonFiles = files.filter(file => file.endsWith(".json"));
+
+            if (jsonFiles.length === 0) {
+                console.log(`⚠️ ATENÇÃO: Nenhum ficheiro .json encontrado na pasta ${dataPath}`);
+                return;
+            }
+
+            for (const file of jsonFiles) {
+                await this.processFile(dataPath, file);
+            }
         } catch (error) {
-            console.log(`Error accessing /data: ${error}`);
+            console.log(`Error accessing ${dataPath}: ${error}`);
         }
     },
 
