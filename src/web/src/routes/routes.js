@@ -57,4 +57,9 @@ export const router = createBrowserRouter([
 
     ]
   }
-])
+], {
+  // silencia os avisos de "future flag" do React Router v6 no console
+  future: {
+    v7_startTransition: true,
+  },
+})

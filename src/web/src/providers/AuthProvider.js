@@ -2,7 +2,7 @@ import { AuthContext } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 
-import axios from 'axios';
+import { authApi } from '../api/api';
 
 import Cookies from 'js-cookie';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
@@ -22,7 +22,25 @@ export const AuthProvider = ({ children }) => {
       const CookieToken = Cookies.get('token');
 
       if (typeof CookieToken === 'string' && CookieToken) {
-        setSigned(true);
+        try {
+          // Decodifica o token guardado para restaurar o utilizador ao recarregar a página
+          const decoded = jwt_decode(CookieToken);
+
+          // Se o token já expirou, limpa tudo em vez de confiar nele
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            Cookies.remove('token');
+            setUser(null);
+            setSigned(false);
+          } else {
+            setUser(decoded);
+            setSigned(true);
+          }
+        } catch (err) {
+          // Token corrompido/ilegível
+          Cookies.remove('token');
+          setUser(null);
+          setSigned(false);
+        }
       } else {
         setUser(null);
         setSigned(false);
@@ -33,21 +51,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const register = async (userData) => {
-    setError(null);
+    setError({});
     try {
-      console.log('userData antes de inserir: ' + JSON.stringify(userData))
       const { username, password } = userData;
-      console.log('username: ' + username + ' password: ' + password)
-      const response = await axios.post(`${process.env.REACT_APP_AUTH_API_URL}/register`, {
+      const response = await authApi.post('/register', {
         username,
         password
       });
-      console.log('userData depois de inserir: ' + userData)
       setUser(response.data);
       toast.success('Your registration is Succefull!!!')
     } catch (err) {
-      setError(err.response ? err.response.data : 'Erro de rede');
-      toast.error(error.error)
+      const errData = err.response ? err.response.data : { error: 'Erro de rede' };
+      setError(errData);
+      toast.error(errData?.error || 'Erro ao registar. Tenta novamente.');
     }
   };
 
@@ -56,40 +72,36 @@ export const AuthProvider = ({ children }) => {
     try {
       const { username, password } = credentials;
 
-      console.log('dados antes da requesicao:' + username + ' - ' + password)
-
-      // make the request into my auth api for logged in
-      const response = await axios.post(`${process.env.REACT_APP_AUTH_API_URL}/login`, {
+      // pedido ao auth-api para autenticar
+      const response = await authApi.post('/login', {
         username,
         password
       });
 
       const token = response.data.token;
-      // generate token with the name "token"
+      // guarda o token nos cookies
       Cookies.set('token', token, { expires: 1 });
-      // save decoded token in User
+      // guarda o token descodificado no estado do utilizador
       const User = jwt_decode(token);
       setUser(User);
 
-      // update signed for true
       setSigned(true);
       toast.success("You logged in!!");
       navigate("/");
 
     } catch (err) {
-      setError(err.response ? err.response.data : 'Erro de rede');
-      console.log('Error: ' + err)
-      toast.error(error.error || err.response?.data?.error);
+      const errData = err.response ? err.response.data : { error: 'Erro de rede' };
+      setError(errData);
+      toast.error(errData?.error || 'Credenciais inválidas ou erro de rede.');
       return false;
     }
 
   };
 
   const logout = () => {
-    // Remove token inside the cookies
     Cookies.remove('token');
-    // Update user state for null 
     setUser(null);
+    setSigned(false);
     navigate("/login")
   };
 

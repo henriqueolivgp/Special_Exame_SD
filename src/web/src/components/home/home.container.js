@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   CircularProgress,
@@ -9,44 +9,28 @@ import {
   Select,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "../../hooks/AuthHook"; // Supondo que useAuth retorna { session }
+import { useAuth } from "../../hooks/AuthHook";
 import { toast } from "react-toastify";
 
-import Cookies from 'js-cookie'; // Não te esqueças de importar isto no topo!
-
-// ... lá mais para baixo, no teu pedido:
+import { blApi } from "../../api/api";
 
 function HomeContent() {
-  const { signed } = useAuth(); // Ajuste conforme seu hook
+  const { signed } = useAuth();
   const [selectedMovie, setSelectedMovie] = useState("");
-  const token = Cookies.get('token'); // Vai buscar o token guardado no login
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["movies"],
-    retry: false, // <-- ISTO DESLIGA AS REPETIÇÕES AUTOMÁTICAS (Acaba o spam de Toasts!)
+    retry: false, // desliga repetições automáticas para não fazer spam de toasts em caso de erro
     queryFn: async () => {
-
-      console.log("Token lido dos cookies: ", token); // <-- Vê na consola se aparece um código gigante ou 'undefined'
-
-      // request to fetch all movies
-      const res = await fetch(`${process.env.REACT_APP_BL_API_URL}/movies`, {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // DICA: Se continuar a falhar, tenta tirar o "Bearer " e deixar só: `Authorization: token`
-        }
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        toast.error(errorText);
-        throw new Error("Sem permissão");
-      }
-
-      const data = await res.json();
-      return data;
+      // o token é anexado automaticamente pelo interceptor do blApi
+      const response = await blApi.get("/movies");
+      return response.data;
     },
     enabled: signed,
+    onError: (err) => {
+      const message = err.response?.data?.error || err.message || "Sem permissão";
+      toast.error(message);
+    },
   });
 
   if (error) {
@@ -65,51 +49,6 @@ function HomeContent() {
           borderRadius: "1rem",
         }}
       >
-        {/* Search Title */}
-        {/* <Box>
-          <h2 style={{ color: "white" }}>Options</h2>
-          <FormControl fullWidth>
-            <InputLabel id="countries-select-label">Title</InputLabel>
-            <Select
-              labelId="countries-select-label"
-              value={selectedMovie}
-              label="Country"
-              onChange={(e) => setselectedMovie(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {movies.map((c) => (
-                <MenuItem key={c} value={c}>
-                  {c}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box> */}
-        {/* Year filter */}
-        {/* <Box>
-          <h2 style={{ color: "white" }}>Options</h2>
-          <FormControl fullWidth>
-            <InputLabel id="countries-select-label">Year</InputLabel>
-            <Select
-              labelId="countries-select-label"
-              value={selectedMovie}
-              label="Country"
-              onChange={(e) => setselectedMovie(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {movies.map((c) => (
-                <MenuItem key={c} value={c}>
-                  {c}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box> */}
-        {/* Search Casts */}
         <Box>
           <h2 style={{ color: "white" }}>Options</h2>
           <FormControl fullWidth>
@@ -123,11 +62,6 @@ function HomeContent() {
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              {/* {movies.map((c) => (
-                <MenuItem key={c} value={c}>
-                  {c}
-                </MenuItem>
-              ))} */}
             </Select>
           </FormControl>
         </Box>
@@ -155,7 +89,7 @@ function HomeContent() {
         ) : error ? (
           // if ocurred an error shows the message
           <div>Erro: {error.message}</div>
-        ) : data && data.length > 0 | data !== undefined ? (
+        ) : data && data.length > 0 ? (
           <div className="table-container rounded-lg overflow-x-auto">
             <table className="w-full mt-4 rounded-lg text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs rounded-lg uppercase bg-gray-700 text-center text-gray-400">

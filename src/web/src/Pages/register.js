@@ -1,4 +1,3 @@
-import { ChevronLeft } from 'lucide-react'
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthHook';
 import { useState } from 'react';
@@ -42,14 +41,14 @@ export function Register() {
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
               <form onSubmit={handleSubmit} className="space-y-6" action="#" method="POST">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium leading-6 text-white">
-                    Email address
+                  <label htmlFor="username" className="block text-sm font-medium leading-6 text-white">
+                    Username
                   </label>
                   <div className="mt-2">
                     <input
                       id="username"
                       name="username"
-                      type="username"
+                      type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder='username'
