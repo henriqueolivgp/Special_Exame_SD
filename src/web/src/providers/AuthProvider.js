@@ -17,6 +17,9 @@ export const AuthProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
+  // O token gerado pelo auth-api tem o formato { tokenPayload: { role }, sub, iat, exp }
+  const role = user?.tokenPayload?.role ?? null;
+
   useEffect(() => {
     const userIsSigned = async () => {
       const CookieToken = Cookies.get('token');
@@ -54,11 +57,10 @@ export const AuthProvider = ({ children }) => {
     setError({});
     try {
       const { username, password } = userData;
-      const response = await authApi.post('/register', {
+      await authApi.post('/register', {
         username,
         password
       });
-      setUser(response.data);
       toast.success('Your registration is Succefull!!!')
     } catch (err) {
       const errData = err.response ? err.response.data : { error: 'Erro de rede' };
@@ -106,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signed, logout, register, login, error }}>
+    <AuthContext.Provider value={{ user, role, loading, signed, logout, register, login, error }}>
       {children}
     </AuthContext.Provider>
   );

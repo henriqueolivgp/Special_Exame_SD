@@ -4,7 +4,7 @@ import { ShieldMinus, Power } from 'lucide-react'
 
 export function Sidebar() {
 
-  const { logout, signed } = useAuth()
+  const { logout, signed, role } = useAuth()
 
   return (
     <>
@@ -58,7 +58,7 @@ export function Sidebar() {
               ) : (
                 null
               )}
-              {signed ? (
+              {signed && role === 'admin' ? (
                 <li>
                   <Link to={'/admin-panel'} className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-500 dark:hover:bg-gray-700 group">
                     <ShieldMinus className="text-gray-400" size={28} />

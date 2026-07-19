@@ -41,7 +41,13 @@ export const router = createBrowserRouter([
           },
           {
             path: "admin-panel",
-            element: <UsersControl />
+            element: (
+              <PrivateRoutes
+                element={<UsersControl />}
+                notHaveAccessNavigateTo="/login"
+                allowedRoles={['admin']}
+              />
+            )
           },
 
         ]
