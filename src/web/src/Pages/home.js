@@ -3,12 +3,11 @@ import { Sidebar } from "../components/home/sidebar";
 
 export default function Home() {
     return (
-        <>
+        <div className="min-h-screen bg-chalk dark:bg-ink">
             <Sidebar />
-            <div className="flex flex-col justify-center p-4 sm:ml-64 ">
+            <div className="flex flex-col p-4 pt-16 sm:pt-6 sm:ml-64">
                 <Outlet />
             </div>
-        </>
+        </div>
     );
 }
-

@@ -8,25 +8,28 @@ import { router } from './routes/routes';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from 'react-toastify';
 
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { ThemeModeProvider } from './providers/ThemeModeProvider';
+import { MuiThemeProvider } from './providers/MuiThemeProvider';
+import { useThemeMode } from './hooks/ThemeHook';
 
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-    },
-});
+// Mantém as notificações legíveis em ambos os temas
+function ThemedToastContainer() {
+    const { mode } = useThemeMode();
+    return <ToastContainer theme={mode} position="top-right" />;
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
 
-        <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
+        <ThemeModeProvider>
+            <MuiThemeProvider>
 
-            <RouterProvider router={router} />
+                <RouterProvider router={router} />
 
-            <ToastContainer />
+                <ThemedToastContainer />
 
-        </ThemeProvider>
+            </MuiThemeProvider>
+        </ThemeModeProvider>
 
     </React.StrictMode>
 );

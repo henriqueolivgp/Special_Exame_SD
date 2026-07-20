@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Button,
   CircularProgress,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,10 +15,25 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { Pencil, Trash2, ShieldMinus } from "lucide-react";
 
 import { authApi } from "../api/api";
 
 const ROLE_OPTIONS = ["admin", "edit", "view"];
+
+const ROLE_STYLES = {
+  admin: "bg-shard/15 text-shard",
+  edit: "bg-reel/15 text-reel",
+  view: "bg-black/10 dark:bg-white/10 text-ink/60 dark:text-chalk/60",
+};
+
+function RoleBadge({ role }) {
+  return (
+    <span className={`inline-block font-mono text-[11px] uppercase tracking-wide px-2 py-0.5 rounded-full ${ROLE_STYLES[role] || ROLE_STYLES.view}`}>
+      {role || "view"}
+    </span>
+  );
+}
 
 export default function UsersControl() {
   const queryClient = useQueryClient();
@@ -84,43 +98,56 @@ export default function UsersControl() {
   };
 
   return (
-    <>
-      <h1 className="text-4xl font-bold text-center mt-10 text-white">Users Control</h1>
-      <Container
-        maxWidth="100%"
-        sx={{
-          backgroundColor: "background.default",
-          padding: "2rem",
-          borderRadius: "1rem",
-        }}
-      >
+    <div className="max-w-4xl w-full mx-auto">
+      <div className="mb-8">
+        <span className="font-mono text-xs tracking-wide text-shard uppercase flex items-center gap-1.5">
+          <ShieldMinus size={13} /> Admin
+        </span>
+        <h1 className="font-display text-3xl font-bold mt-1">Utilizadores</h1>
+      </div>
+
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-bone dark:bg-fog overflow-hidden">
         {isLoading ? (
-          <CircularProgress />
+          <div className="flex justify-center py-16">
+            <CircularProgress />
+          </div>
         ) : error ? (
-          <div className="text-red-500">
+          <div className="p-6 text-red-500 text-sm">
             Erro ao carregar utilizadores: {error.response?.data?.error || error.message}
           </div>
         ) : users && users.length > 0 ? (
-          <div className="table-container rounded-lg overflow-x-auto">
-            <table className="w-full mt-4 rounded-lg text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs rounded-lg uppercase bg-gray-700 text-center text-gray-400">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs uppercase tracking-wide font-mono text-ink/50 dark:text-chalk/50 bg-black/5 dark:bg-white/5">
                 <tr>
-                  <th className="px-6 py-3 whitespace-nowrap">Id</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Username</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Role</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Buttons</th>
+                  <th className="px-5 py-3 font-medium">Id</th>
+                  <th className="px-5 py-3 font-medium">Username</th>
+                  <th className="px-5 py-3 font-medium">Role</th>
+                  <th className="px-5 py-3 font-medium text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr className="bg-gray-800 border-b border-gray-200" key={user.id}>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap">{user.id}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap">{user.username}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap">{user.role}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap">
-                      <div className="flex gap-2">
-                        <button className="p-2 bg-blue-400 rounded-lg font-semibold" onClick={() => openEditModal(user)}>Edit</button>
-                        <button className="p-2 bg-red-400 rounded-lg font-semibold" onClick={() => handleDelete(user)}>Delete</button>
+                  <tr key={user.id} className="border-t border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]">
+                    <td className="px-5 py-3.5 font-mono text-xs text-ink/50 dark:text-chalk/50">{user.id}</td>
+                    <td className="px-5 py-3.5 font-medium">{user.username}</td>
+                    <td className="px-5 py-3.5"><RoleBadge role={user.role} /></td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => openEditModal(user)}
+                          aria-label="Editar utilizador"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-ink/60 dark:text-chalk/60 hover:bg-shard/15 hover:text-shard transition-colors"
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user)}
+                          aria-label="Apagar utilizador"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-ink/60 dark:text-chalk/60 hover:bg-red-500/15 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={15} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -129,12 +156,14 @@ export default function UsersControl() {
             </table>
           </div>
         ) : (
-          <div className="text-white">Nenhum utilizador encontrado.</div>
+          <div className="p-6 text-ink/50 dark:text-chalk/50 text-center">Nenhum utilizador encontrado.</div>
         )}
-      </Container>
+      </div>
 
       <Dialog open={!!editingUser} onClose={() => setEditingUser(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>Editar Utilizador</DialogTitle>
+        <DialogTitle sx={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700 }}>
+          Editar Utilizador
+        </DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -165,6 +194,6 @@ export default function UsersControl() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 }

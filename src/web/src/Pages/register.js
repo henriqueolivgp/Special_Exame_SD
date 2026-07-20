@@ -1,104 +1,67 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthHook';
 import { useState } from 'react';
+import { UserPlus } from 'lucide-react';
 
-import { Sidebar } from '../components/home/sidebar';
+import { AuthLayout } from '../components/auth/AuthLayout';
+import { FormInput } from '../components/ui/FormInput';
 
-// Dentro da export function ate ao return vao os scripts de comunicacao do front com o back
 export function Register() {
-
   const { register } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     await register({ username, password });
-
-    console.log('data do front' + username, password)
-
+    setSubmitting(false);
   };
 
   return (
-    <>
-
-      <Sidebar />
-
-      <div className="flex flex-col justify-center p-4 sm:ml-64 mx-auto bg-slate-700 h-screen ">
-        <div className="content flex items-center">
-          <div className="flex items-center content-center min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <img
-                className="mx-auto w-16"
-                src="/logo512.png"
-                alt="Your Company"
-              />
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
-                Create your account
-              </h2>
-            </div>
-
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form onSubmit={handleSubmit} className="space-y-6" action="#" method="POST">
-                <div>
-                  <label htmlFor="username" className="block text-sm font-medium leading-6 text-white">
-                    Username
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="username"
-                      name="username"
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder='username'
-                      required
-                      className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="block text-sm font-medium leading-6 text-white">
-                      Password
-                    </label>
-                  </div>
-                  <div className="mt-2">
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                      placeholder='*******'
-                      required
-                      className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <button
-                    type="submit"
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    Register
-                  </button>
-                </div>
-              </form>
-
-              <p className="mt-10 text-center text-sm text-slate-300">
-                You have an account?{' '}
-                <Link to="/login" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                  Sign in here
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+    <AuthLayout
+      eyebrow="Primeira vez por aqui"
+      title="Cria a tua conta"
+      subtitle="Começa com o perfil Viewer, sobe de permissões com um admin."
+      footer={
+        <>
+          Já tens conta?{' '}
+          <Link to="/login" className="font-semibold text-shard hover:text-shard-dim">
+            Entra aqui
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <FormInput
+          id="username"
+          label="Username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="escolhe um username"
+          required
+        />
+        <FormInput
+          id="password"
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+          placeholder="••••••••"
+          required
+        />
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-shard px-4 py-2.5 text-sm font-semibold text-white shadow-shard hover:bg-shard-dim transition-colors disabled:opacity-60"
+        >
+          <UserPlus size={16} />
+          {submitting ? 'A criar conta...' : 'Criar conta'}
+        </button>
+      </form>
+    </AuthLayout>
   );
 }

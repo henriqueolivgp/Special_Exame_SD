@@ -1,17 +1,11 @@
 import { useState } from "react";
 import {
-  Box,
   Button,
   CircularProgress,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -19,6 +13,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/AuthHook";
 import { toast } from "react-toastify";
+import { Film, Plus, Eye, Pencil, Trash2, LogIn } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { blApi } from "../../api/api";
 
@@ -45,9 +41,85 @@ function buildPayload(form) {
   };
 }
 
+function Poster({ src, title }) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={title}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.currentTarget.style.display = "none";
+          e.currentTarget.nextSibling.style.display = "flex";
+        }}
+      />
+    );
+  }
+  return <PosterFallback />;
+}
+
+function PosterFallback() {
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-black/5 dark:bg-white/5 text-ink/25 dark:text-chalk/25">
+      <Film size={28} />
+    </div>
+  );
+}
+
+function MovieCard({ movie, canEdit, canDelete, onView, onEdit, onDelete }) {
+  return (
+    <div className="group rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-bone dark:bg-fog hover:border-shard/50 transition-colors">
+      <div className="relative aspect-[2/3] bg-black/5 dark:bg-white/5">
+        <Poster src={movie.thumbnail} title={movie.title} />
+        <div className="hidden w-full h-full absolute inset-0"><PosterFallback /></div>
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center gap-2 p-3">
+          <button
+            onClick={() => onView(movie)}
+            aria-label="Ver detalhes"
+            className="w-9 h-9 rounded-lg bg-white/90 text-ink flex items-center justify-center hover:bg-white"
+          >
+            <Eye size={16} />
+          </button>
+          {canEdit && (
+            <button
+              onClick={() => onEdit(movie)}
+              aria-label="Editar filme"
+              className="w-9 h-9 rounded-lg bg-shard text-white flex items-center justify-center hover:bg-shard-dim"
+            >
+              <Pencil size={16} />
+            </button>
+          )}
+          {canDelete && (
+            <button
+              onClick={() => onDelete(movie)}
+              aria-label="Apagar filme"
+              className="w-9 h-9 rounded-lg bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
+
+        {movie.year && (
+          <span className="absolute top-2 left-2 font-mono text-[11px] px-2 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-sm">
+            {movie.year}
+          </span>
+        )}
+      </div>
+
+      <div className="p-3">
+        <h3 className="font-display font-semibold text-sm leading-snug line-clamp-2 mb-1">{movie.title}</h3>
+        {movie.genres && (
+          <p className="text-xs text-ink/50 dark:text-chalk/50 truncate">{movie.genres}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function HomeContent() {
   const { signed, role } = useAuth();
-  const [selectedMovie, setSelectedMovie] = useState("");
   const queryClient = useQueryClient();
 
   const canEdit = role === "admin" || role === "edit";
@@ -156,118 +228,73 @@ function HomeContent() {
     }
   };
 
-  if (error) {
-    return <div>Erro: {error.message}</div>;
-  }
-
   return (
-    <>
-      <h1 className="text-4xl font-bold text-center mt-10">Best Movies</h1>
-
-      <Container
-        sx={{
-          backgroundColor: "background.default",
-          padding: "2rem",
-          borderRadius: "1rem",
-        }}
-      >
-        <Box>
-          <h2 style={{ color: "white" }}>Options</h2>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <FormControl fullWidth>
-              <InputLabel id="countries-select-label">Casts</InputLabel>
-              <Select
-                labelId="countries-select-label"
-                value={selectedMovie}
-                label="Country"
-                onChange={(e) => setSelectedMovie(e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-              </Select>
-            </FormControl>
-            {canCreate && signed && (
-              <Button variant="contained" onClick={openCreateModal} sx={{ whiteSpace: "nowrap" }}>
-                + Add Movie
-              </Button>
-            )}
-          </Stack>
-        </Box>
-      </Container>
-
-      <Container
-        sx={{
-          backgroundColor: "info.dark",
-          padding: "2rem",
-          marginTop: "2rem",
-          borderRadius: "1rem",
-          color: "white",
-        }}
-      >
-        <h2 className="text-4xl font-bold">Results</h2>
-        {!signed ? (
-          <div className="flex w-full h-screen justify-center items-center">
-            <h1 className="text-2xl font-semibold text-red-600">Make login for see all movies.</h1>
-          </div>
-        ) : isLoading ? (
-          <CircularProgress />
-        ) : error ? (
-          <div>Erro: {error.message}</div>
-        ) : data && data.length > 0 ? (
-          <div className="table-container rounded-lg overflow-x-auto">
-            <table className="w-full mt-4 rounded-lg text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs rounded-lg uppercase bg-gray-700 text-center text-gray-400">
-                <tr className="rounded-lg">
-                  <th className="px-6 py-3 whitespace-nowrap ">Title</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Year</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Cast</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Genres</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Url</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Extract</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Thumbnail</th>
-                  <th className="px-6 py-3 whitespace-nowrap">Buttons</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((movie) => (
-                  <tr className="bg-gray-800 border-b border-gray-200" key={movie.id}>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate">{movie.title}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap">{movie.year}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate">{movie.cast}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate">{movie.genres}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate">{movie.href}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate">{movie.extract}</td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate"><img width={50} src={movie.thumbnail} alt="" /></td>
-                    <td className="px-4 py-4 font-medium text-white whitespace-nowrap max-w-xs table-cell-truncate">
-                      <div className="flex gap-2">
-                        <button className="p-2 bg-blue-400 rounded-lg font-semibold" onClick={() => setViewingMovie(movie)}>View</button>
-                        {canEdit && (
-                          <button className="p-2 bg-blue-400 rounded-lg font-semibold" onClick={() => openEditModal(movie)}>Edit</button>
-                        )}
-                        {canDelete && (
-                          <button className="p-2 bg-red-400 rounded-lg font-semibold" onClick={() => handleDeleteMovie(movie)}>Delete</button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div>--</div>
+    <div className="max-w-6xl w-full mx-auto">
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <div>
+          <span className="font-mono text-xs tracking-wide text-shard uppercase">Catálogo</span>
+          <h1 className="font-display text-3xl font-bold mt-1">Filmes</h1>
+        </div>
+        {canCreate && signed && (
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center gap-2 rounded-lg bg-shard px-4 py-2.5 text-sm font-semibold text-white shadow-shard hover:bg-shard-dim transition-colors"
+          >
+            <Plus size={16} />
+            Adicionar filme
+          </button>
         )}
-      </Container>
+      </div>
+
+      {!signed ? (
+        <div className="flex flex-col items-center justify-center text-center rounded-xl border border-dashed border-black/15 dark:border-white/15 py-24 px-6">
+          <Film className="text-shard mb-4" size={32} />
+          <h2 className="font-display text-xl font-semibold mb-2">Inicia sessão para ver o catálogo</h2>
+          <p className="text-sm text-ink/60 dark:text-chalk/60 max-w-sm mb-6">
+            O acesso aos filmes depende do serviço de autenticação — sem sessão, não há dados.
+          </p>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 rounded-lg bg-shard px-4 py-2.5 text-sm font-semibold text-white hover:bg-shard-dim transition-colors"
+          >
+            <LogIn size={16} />
+            Entrar
+          </Link>
+        </div>
+      ) : isLoading ? (
+        <div className="flex justify-center py-24">
+          <CircularProgress />
+        </div>
+      ) : error ? (
+        <div className="text-red-500 text-sm">Erro: {error.message}</div>
+      ) : data && data.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {data.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onView={setViewingMovie}
+              onEdit={openEditModal}
+              onDelete={handleDeleteMovie}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-ink/50 dark:text-chalk/50 py-24">Nenhum filme no catálogo ainda.</div>
+      )}
 
       {/* Modal de Visualização */}
       <Dialog open={!!viewingMovie} onClose={() => setViewingMovie(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>{viewingMovie?.title}</DialogTitle>
+        <DialogTitle sx={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700 }}>
+          {viewingMovie?.title}
+        </DialogTitle>
         <DialogContent dividers>
           {viewingMovie && (
-            <Stack spacing={1}>
+            <Stack spacing={1.5}>
               {viewingMovie.thumbnail && (
-                <img src={viewingMovie.thumbnail} alt={viewingMovie.title} style={{ maxWidth: "100%", borderRadius: 8 }} />
+                <img src={viewingMovie.thumbnail} alt={viewingMovie.title} style={{ maxWidth: "180px", borderRadius: 10 }} />
               )}
               <Typography><strong>Ano:</strong> {viewingMovie.year}</Typography>
               <Typography><strong>Elenco:</strong> {viewingMovie.cast}</Typography>
@@ -288,7 +315,9 @@ function HomeContent() {
 
       {/* Modal de Criação/Edição */}
       <Dialog open={!!editingMovie} onClose={closeEditModal} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingMovie?.id ? "Editar Filme" : "Novo Filme"}</DialogTitle>
+        <DialogTitle sx={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700 }}>
+          {editingMovie?.id ? "Editar Filme" : "Novo Filme"}
+        </DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField label="Título" value={form.title} onChange={handleFormChange("title")} required fullWidth />
@@ -311,7 +340,7 @@ function HomeContent() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 }
 
