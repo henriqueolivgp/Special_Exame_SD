@@ -3,8 +3,8 @@ module.exports = {
   content: ["./src/**/*.{html,js}"],
   theme: {
     colors: {
-      chalk: '#F4F4F5', // Coloca aqui o código da tua cor clara
-      ink: '#18181B',   // Coloca aqui o código da tua cor escura
+      chalk: '#18181B', // Coloca aqui o código da tua cor clara
+      ink: '#F4F4F5',   // Coloca aqui o código da tua cor escura
     },
     screens: {
       'xxs': '250px',
