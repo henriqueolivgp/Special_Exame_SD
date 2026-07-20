@@ -1,7 +1,5 @@
 // Imports
 const userService = require('../services/user.service')
-const UserModel = require('../models/user.model')
-const cookieParser = require("cookie-parser");
 
 const getAllUsers = async (req, res) => {
   try {

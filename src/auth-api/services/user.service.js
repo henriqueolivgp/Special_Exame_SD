@@ -5,7 +5,7 @@ const knex = require('knex')(knexConfig);
 
 const getAllUsers = async () => {
     try {
-        const users = await knex.select('*').from('users');
+        const users = await knex.select('id', 'username', 'role', 'created_at', 'updated_at').from('users');
         return users;
     } catch (error) {
         throw new Error('Error searching all users');
@@ -87,20 +87,12 @@ const updateUser = async (id, newUsername, newRole) => {
     try {
         console.log('Inicio update de utilizador');
 
-        // Verifica se o novo nome de usuário já está em uso
+        // Verifica se o novo nome de usuário já está em uso por OUTRO utilizador
         console.log('A verificar se o novo nome de utilizador já está em uso');
         const existingUser = await knex('users').where({ username: newUsername }).first();
-        if (existingUser && existingUser.id !== id) {
+        if (existingUser && String(existingUser.id) !== String(id)) {
             throw new Error('Este nome de utilizador já está em uso.');
         }
-
-        const role = await knex('roles').where({ typeRole: newRole }).first('id');
-        if (!role) {
-            throw new Error('Role não encontrado.');
-        }
-        console.log(role.id)
-        console.log(newUsername)
-        console.log('id: ' + id)
 
         const userExists = await knex('users').where({ id: id }).first();
         if (!userExists) {
@@ -108,13 +100,19 @@ const updateUser = async (id, newUsername, newRole) => {
         }
         console.log('User encontrado com o id:' + id)
 
-        // Atualiza o usuário no banco de dados
+        const validRoles = ['admin', 'view', 'edit'];
+        if (!validRoles.includes(newRole)) {
+            throw new Error('Role inválido. Os roles permitidos são: admin, view, edit.');
+        }
+
+        // Atualiza o usuário no banco de dados (a tabela 'users' guarda o role diretamente,
+        // não existe tabela 'roles' nem coluna 'role_id')
         console.log('A atualizar utilizador no banco de dados');
         const updated = await knex('users')
             .where({ id: id })
             .update({
                 username: newUsername,
-                role_id: role.id,
+                role: newRole,
             });
 
         if (updated === 0) {

@@ -3,9 +3,12 @@ const jwt = require('jsonwebtoken');
 
 function verifyAuth(req, res, next) {
 
-  // Obtém o token dos cookies
-  const token = req.cookies.token;
-  
+  // Aceita o token tanto via header Authorization: Bearer <token> (usado pelo frontend,
+  // já que o cookie httpOnly não sobrevive entre domínios diferentes) como via cookie
+  const authHeader = req.headers.authorization;
+  const bearerToken = authHeader && authHeader.split(' ')[1];
+  const token = bearerToken || req.cookies.token;
+
   // Se o token não existir, retorna um erro
   if (!token) {
     return res.status(401).json({ error: 'Token não existe' });

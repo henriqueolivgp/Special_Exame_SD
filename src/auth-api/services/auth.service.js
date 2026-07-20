@@ -34,14 +34,16 @@ const register = async (username, password, role = 'admin') => {
 
 const login = async (username, password) => {
   try {
-    // console.log('Iniciando login de usuário'); 
-
     const user = await knex('users').where({ username }).first();
+
+    if (!user) {
+      throw new Error('Invalid credentials. Pls check the inputs!!');
+    }
 
     // Hash da senha fornecida e comparação com a senha armazenada
     const passwordHashed = crypto.createHash('sha256').update(password).digest('hex');
 
-    if (user.password !== passwordHashed && !user) {
+    if (user.password !== passwordHashed) {
       throw new Error('Invalid credentials. Pls check the inputs!!');
     }
 
@@ -54,7 +56,7 @@ const login = async (username, password) => {
     
     return { token, user };
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message || error);
   }
 };
 
